@@ -1,11 +1,12 @@
-import constants from './constants';
-import CryptoJSWordArray from './WordArray';
-import PBKDF2 from 'crypto-js/pbkdf2';
+import PBKDF2 from "crypto-js/pbkdf2";
+
+import constants from "./constants";
+import CryptoJSWordArray from "./WordArray";
 
 let utils = {
-  metaKey: '_secure__ls__metadata',
-  encryptionSecret: '',
-  secretPhrase: 's3cr3t$#@135^&*246',
+  metaKey: "_secure__ls__metadata",
+  encryptionSecret: "",
+  secretPhrase: "s3cr3t$#@135^&*246",
   allKeys: [],
   is: function (key) {
     if (key) {
@@ -19,7 +20,7 @@ let utils = {
   },
   generateSecretKey: function () {
     let salt = CryptoJSWordArray.random(128 / 8);
-    let key128Bits = PBKDF2(this.secretPhrase, salt, {keySize: 128 / 32 });
+    let key128Bits = PBKDF2(this.secretPhrase, salt, { keySize: 128 / 32 });
 
     return key128Bits && key128Bits.toString();
   },
@@ -28,7 +29,8 @@ let utils = {
       return {};
     }
 
-    let i, obj = {};
+    let i,
+      obj = {};
 
     for (i = 0; i < data.length; i++) {
       if (data[i].k === key) {
@@ -44,7 +46,7 @@ let utils = {
       return [];
     }
 
-    return data.keys.map(keyData => {
+    return data.keys.map((keyData) => {
       return keyData.k;
     });
   },
@@ -66,11 +68,12 @@ let utils = {
   addToKeysList: function (key) {
     this.allKeys.push({
       k: key,
-      s: this.encryptionSecret
+      s: this.encryptionSecret,
     });
   },
   removeFromKeysList: function (key) {
-    let i, index = -1;
+    let i,
+      index = -1;
 
     for (i = 0; i < this.allKeys.length; i++) {
       if (this.allKeys[i].k === key) {
@@ -82,7 +85,7 @@ let utils = {
       this.allKeys.splice(index, 1);
     }
     return index;
-  }
+  },
 };
 
 module.exports = utils;

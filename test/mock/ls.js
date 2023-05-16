@@ -1,12 +1,12 @@
 // Storage Mock
 let mockLS = {
-  storage: {}
+  storage: {},
 };
 
 mockLS.storageMock = function () {
   return {
     setItem: (key, value) => {
-      this.storage[key] = value || '';
+      this.storage[key] = value || "";
     },
     getItem: (key) => {
       return this.storage[key] || null;
@@ -21,7 +21,7 @@ mockLS.storageMock = function () {
       let keys = Object.keys(this.storage);
 
       return keys[i] || null;
-    }
+    },
   };
 };
 module.exports = mockLS;

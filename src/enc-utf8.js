@@ -11,7 +11,9 @@ enc.Latin1 = {
     // Shortcuts
     let words = wordArray.words;
     let sigBytes = wordArray.sigBytes;
-    let latin1Chars = [], i, bite;
+    let latin1Chars = [],
+      i,
+      bite;
 
     // Convert
     for (i = 0; i < sigBytes; i++) {
@@ -19,8 +21,8 @@ enc.Latin1 = {
       latin1Chars.push(String.fromCharCode(bite));
     }
 
-    return latin1Chars.join('');
-  }
+    return latin1Chars.join("");
+  },
 };
 
 enc._Utf8 = {
@@ -28,9 +30,9 @@ enc._Utf8 = {
     try {
       return decodeURIComponent(escape(enc.Latin1.stringify(wordArray)));
     } catch (e) {
-      throw new Error('Malformed UTF-8 data');
+      throw new Error("Malformed UTF-8 data");
     }
-  }
+  },
 };
 
 module.exports = enc;

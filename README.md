@@ -1,6 +1,6 @@
 # secure-ls
 
-Secure localStorage data with high level of encryption and data compression.
+Secure AsyncStorage data with high level of encryption and data compression.
 
 [![npm version](https://badge.fury.io/js/secure-ls.svg)](https://www.npmjs.com/package/secure-ls) [![npm](https://img.shields.io/npm/dt/secure-ls.svg)](https://www.npmjs.com/package/secure-ls) [![Build Status](http://img.shields.io/travis/softvar/secure-ls/master.svg?style=flat)](http://travis-ci.org/softvar/secure-ls) [![Coverage Status](https://coveralls.io/repos/github/softvar/secure-ls/badge.svg?branch=master)](https://coveralls.io/github/softvar/secure-ls?branch=master)
 
@@ -9,9 +9,9 @@ Secure localStorage data with high level of encryption and data compression.
 ## Features
 
 * Secure data with various types of encryption including `AES`, `DES`, `Rabbit` and `RC4`. (defaults to `Base64` encoding).
-* Compress data before storing it to `localStorage` to save extra bytes (defaults to `true`).
-* Advanced API wrapper over `localStorage` API, providing other basic utilities.
-* Save data in multiple keys inside `localStorage` and `secure-ls` will always remember it's creation.
+* Compress data before storing it to `AsyncStorage` to save extra bytes (defaults to `true`).
+* Advanced API wrapper over `AsyncStorage` API, providing other basic utilities.
+* Save data in multiple keys inside `AsyncStorage` and `secure-ls` will always remember it's creation.
 
 ## Installation
 
@@ -164,7 +164,7 @@ var ls = new SecureLS({encodingType: 'rc4', isCompression: false, encryptionSecr
 
 * **`set`**
 
-  Saves `data` in specifed `key` in localStorage. If the key is not provided, the library will warn. Following types of JavaScript objects are supported:
+  Saves `data` in specifed `key` in AsyncStorage. If the key is not provided, the library will warn. Following types of JavaScript objects are supported:
 
   * Array
   * ArrayBuffer
@@ -193,7 +193,7 @@ var ls = new SecureLS({encodingType: 'rc4', isCompression: false, encryptionSecr
 
 * **`get`**
 
-  Gets `data` back from specified `key` from the localStorage library. If the key is not provided, the library will warn.
+  Gets `data` back from specified `key` from the AsyncStorage library. If the key is not provided, the library will warn.
 
   |   Parameter   |         Description                 |
   | ------------- | ----------------------------------- |
@@ -205,7 +205,7 @@ var ls = new SecureLS({encodingType: 'rc4', isCompression: false, encryptionSecr
 
 * **`remove`**
 
-  Removes the value of a key from the localStorage. If the `meta key`, which stores the list of keys, is tried to be removed even if there are other keys which were created by `secure-ls` library, the library will warn for the action.
+  Removes the value of a key from the AsyncStorage. If the `meta key`, which stores the list of keys, is tried to be removed even if there are other keys which were created by `secure-ls` library, the library will warn for the action.
 
   |   Parameter   |         Description                       |
   | ------------- | ----------------------------------------- |
@@ -225,7 +225,7 @@ var ls = new SecureLS({encodingType: 'rc4', isCompression: false, encryptionSecr
 
 * **`clear`**
 
-  Removes all the keys ever created for that particular domain. Remember localStorage works differently for `http` and `https` protocol;
+  Removes all the keys ever created for that particular domain. Remember AsyncStorage works differently for `http` and `https` protocol;
 
   ```
     ls.clear()

@@ -1,18 +1,19 @@
-import utils from './utils';
-import constants from './constants';
-import enc from './enc-utf8';
+import AES from "crypto-js/aes";
+import RC4 from "crypto-js/rc4";
+import DES from "crypto-js/tripledes";
+import RABBIT from "crypto-js/rabbit";
+import LZString from "lz-string/libs/lz-string";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import Base64 from './Base64';
-import LZString from 'lz-string/libs/lz-string';
-import AES from 'crypto-js/aes';
-import DES from 'crypto-js/tripledes';
-import RABBIT from 'crypto-js/rabbit';
-import RC4 from 'crypto-js/rc4';
+import utils from "./utils";
+import enc from "./enc-utf8";
+import Base64 from "./Base64";
+import constants from "./constants";
 
 export default class SecureLS {
   constructor(config) {
     config = config || {};
-    this._name = 'secure-ls';
+    this._name = "secure-ls";
     this.utils = utils;
     this.constants = constants;
     this.Base64 = Base64;
@@ -27,18 +28,18 @@ export default class SecureLS {
       isCompression: true,
       encodingType: constants.EncrytionTypes.BASE64,
       encryptionSecret: config.encryptionSecret,
-      encryptionNamespace: config.encryptionNamespace
+      encryptionNamespace: config.encryptionNamespace,
     };
-    this.config.isCompression = typeof config.isCompression !== 'undefined' ?
-      config.isCompression :
-      true;
-    this.config.encodingType = (typeof config.encodingType !== 'undefined' || config.encodingType === '') ?
-      config.encodingType.toLowerCase() :
-      constants.EncrytionTypes.BASE64;
+    this.config.isCompression =
+      typeof config.isCompression !== "undefined" ? config.isCompression : true;
+    this.config.encodingType =
+      typeof config.encodingType !== "undefined" || config.encodingType === ""
+        ? config.encodingType.toLowerCase()
+        : constants.EncrytionTypes.BASE64;
 
-    this.ls = localStorage;
+    this.ls = AsyncStorage;
     this.init();
-  };
+  }
 
   init() {
     let metaData = this.getMetaData();
@@ -56,33 +57,40 @@ export default class SecureLS {
 
     // fill the already present keys to the list of keys being used by secure-ls
     this.utils.allKeys = metaData.keys || this.resetAllKeys();
-  };
+  }
 
   _isBase64EncryptionType() {
-    return Base64 &&
-      (typeof this.config.encodingType === 'undefined' ||
-      this.config.encodingType === this.constants.EncrytionTypes.BASE64);
-  };
+    return (
+      Base64 &&
+      (typeof this.config.encodingType === "undefined" ||
+        this.config.encodingType === this.constants.EncrytionTypes.BASE64)
+    );
+  }
 
   _isAESEncryptionType() {
-    return AES &&
-      (this.config.encodingType === this.constants.EncrytionTypes.AES);
-  };
+    return (
+      AES && this.config.encodingType === this.constants.EncrytionTypes.AES
+    );
+  }
 
   _isDESEncryptionType() {
-    return DES &&
-      (this.config.encodingType === this.constants.EncrytionTypes.DES);
-  };
+    return (
+      DES && this.config.encodingType === this.constants.EncrytionTypes.DES
+    );
+  }
 
   _isRabbitEncryptionType() {
-    return RABBIT &&
-      (this.config.encodingType === this.constants.EncrytionTypes.RABBIT);
-  };
+    return (
+      RABBIT &&
+      this.config.encodingType === this.constants.EncrytionTypes.RABBIT
+    );
+  }
 
   _isRC4EncryptionType() {
-    return RC4 &&
-      (this.config.encodingType === this.constants.EncrytionTypes.RC4);
-  };
+    return (
+      RC4 && this.config.encodingType === this.constants.EncrytionTypes.RC4
+    );
+  }
 
   _isDataCompressionEnabled() {
     return this.config.isCompression;
@@ -96,12 +104,8 @@ export default class SecureLS {
       return;
     }
 
-    if (this._isAES ||
-      this._isDES ||
-      this._isRabbit ||
-      this._isRC4
-    ) {
-      if (typeof this.config.encryptionSecret === 'undefined') {
+    if (this._isAES || this._isDES || this._isRabbit || this._isRC4) {
+      if (typeof this.config.encryptionSecret === "undefined") {
         this.utils.encryptionSecret = obj.s;
 
         if (!this.utils.encryptionSecret) {
@@ -109,14 +113,15 @@ export default class SecureLS {
           this.setMetaData();
         }
       } else {
-        this.utils.encryptionSecret = this.config.encryptionSecret || obj.s || '';
+        this.utils.encryptionSecret =
+          this.config.encryptionSecret || obj.s || "";
       }
     }
   }
 
   get(key, isAllKeysData) {
-    let decodedData = '',
-      jsonData = '',
+    let decodedData = "",
+      jsonData = "",
       deCompressedData,
       bytes,
       data;
@@ -133,23 +138,37 @@ export default class SecureLS {
     }
 
     deCompressedData = data; // saves else
-    if (this._isCompression || isAllKeysData) { // meta data always compressed
+    if (this._isCompression || isAllKeysData) {
+      // meta data always compressed
       deCompressedData = LZString.decompressFromUTF16(data);
     }
 
     decodedData = deCompressedData; // saves else
-    if (this._isBase64 || isAllKeysData) { // meta data always Base64
+    if (this._isBase64 || isAllKeysData) {
+      // meta data always Base64
       decodedData = Base64.decode(deCompressedData);
     } else {
       this.getEncryptionSecret(key);
       if (this._isAES) {
-        bytes = AES.decrypt(deCompressedData.toString(), this.utils.encryptionSecret);
+        bytes = AES.decrypt(
+          deCompressedData.toString(),
+          this.utils.encryptionSecret
+        );
       } else if (this._isDES) {
-        bytes = DES.decrypt(deCompressedData.toString(), this.utils.encryptionSecret);
+        bytes = DES.decrypt(
+          deCompressedData.toString(),
+          this.utils.encryptionSecret
+        );
       } else if (this._isRabbit) {
-        bytes = RABBIT.decrypt(deCompressedData.toString(), this.utils.encryptionSecret);
+        bytes = RABBIT.decrypt(
+          deCompressedData.toString(),
+          this.utils.encryptionSecret
+        );
       } else if (this._isRC4) {
-        bytes = RC4.decrypt(deCompressedData.toString(), this.utils.encryptionSecret);
+        bytes = RC4.decrypt(
+          deCompressedData.toString(),
+          this.utils.encryptionSecret
+        );
       }
 
       if (bytes) {
@@ -160,24 +179,24 @@ export default class SecureLS {
     try {
       jsonData = JSON.parse(decodedData);
     } catch (e) {
-      throw new Error('Could not parse JSON');
+      throw new Error("Could not parse JSON");
     }
 
     return jsonData;
-  };
+  }
 
   getDataFromLocalStorage(key) {
     return this.ls.getItem(key, true);
-  };
+  }
 
   getAllKeys() {
     let data = this.getMetaData();
 
     return this.utils.extractKeyNames(data) || [];
-  };
+  }
 
   set(key, data) {
-    let dataToStore = '';
+    let dataToStore = "";
 
     if (!this.utils.is(key)) {
       this.utils.warn(this.WarningEnum.KEY_NOT_PROVIDED);
@@ -197,11 +216,11 @@ export default class SecureLS {
     dataToStore = this.processData(data);
     // Store the data to localStorage
     this.setDataToLocalStorage(key, dataToStore);
-  };
+  }
 
   setDataToLocalStorage(key, data) {
     this.ls.setItem(key, data);
-  };
+  }
 
   remove(key) {
     if (!this.utils.is(key)) {
@@ -219,7 +238,7 @@ export default class SecureLS {
       this.setMetaData();
     }
     this.ls.removeItem(key);
-  };
+  }
 
   removeAll() {
     let keys, i;
@@ -231,12 +250,12 @@ export default class SecureLS {
     this.ls.removeItem(this.utils.metaKey);
 
     this.resetAllKeys();
-  };
+  }
 
   clear() {
     this.ls.clear();
     this.resetAllKeys();
-  };
+  }
 
   resetAllKeys() {
     this.utils.allKeys = [];
@@ -244,8 +263,8 @@ export default class SecureLS {
   }
 
   processData(data, isAllKeysData) {
-    if (data === null || data === undefined || data === '') {
-      return '';
+    if (data === null || data === undefined || data === "") {
+      return "";
     }
 
     let jsonData, encodedData, compressedData;
@@ -253,7 +272,7 @@ export default class SecureLS {
     try {
       jsonData = JSON.stringify(data);
     } catch (e) {
-      throw new Error('Could not stringify data.');
+      throw new Error("Could not stringify data.");
     }
 
     // Encode Based on encoding type
@@ -282,23 +301,30 @@ export default class SecureLS {
     }
 
     return compressedData;
-  };
+  }
 
   setMetaData() {
-    let dataToStore = this.processData({
-      keys: this.utils.allKeys
-    }, true);
+    let dataToStore = this.processData(
+      {
+        keys: this.utils.allKeys,
+      },
+      true
+    );
 
     // Store the data to localStorage
     this.setDataToLocalStorage(this.getMetaKey(), dataToStore);
-  };
+  }
 
   getMetaData() {
     return this.get(this.getMetaKey(), true) || {};
-  };
-
-  getMetaKey() {
-    return this.utils.metaKey + (this.config.encryptionNamespace ? '__' + this.config.encryptionNamespace : '');
   }
 
-};
+  getMetaKey() {
+    return (
+      this.utils.metaKey +
+      (this.config.encryptionNamespace
+        ? "__" + this.config.encryptionNamespace
+        : "")
+    );
+  }
+}

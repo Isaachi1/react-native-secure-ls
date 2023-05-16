@@ -9,20 +9,20 @@ let CryptoJSWordArray = {};
 
 CryptoJSWordArray.random = function (nBytes) {
   let words = [];
-  let r = (function (mw) {
+  let r = function (mw) {
     let mz = 0x3ade68b1;
     let mask = 0xffffffff;
 
     return function () {
-      mz = (0x9069 * (mz & 0xFFFF) + (mz >> 0x10)) & mask;
-      mw = (0x4650 * (mw & 0xFFFF) + (mw >> 0x10)) & mask;
+      mz = (0x9069 * (mz & 0xffff) + (mz >> 0x10)) & mask;
+      mw = (0x4650 * (mw & 0xffff) + (mw >> 0x10)) & mask;
       let result = ((mz << 0x10) + mw) & mask;
 
       result /= 0x100000000;
       result += 0.5;
       return result * (Math.random() > 0.5 ? 1 : -1);
     };
-  });
+  };
 
   for (let i = 0, rcache; i < nBytes; i += 4) {
     let _r = r((rcache || Math.random()) * 0x100000000);
